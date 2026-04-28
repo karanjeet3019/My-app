@@ -1,0 +1,10 @@
+{
+  "name": "PageRemix AI",
+  "description": "AI-powered Shopify store and product page rebuilder. Recreate successful layouts with fresh, unique branding, copy, and AI image prompts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "AI-powered content generation",
+    "URL structure analysis",
+    "Shopify theme logic conversion"
+  ]
+}
