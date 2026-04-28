@@ -55,7 +55,7 @@ export default function DashboardShell({
   activeTab: string;
   setActiveTab: (id: string) => void;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
     { id: 'analyze', label: 'URL Analyzer', icon: Search },
@@ -68,27 +68,38 @@ export default function DashboardShell({
   ];
 
   return (
-    <div className="min-h-screen bg-[#F6F6F7] flex text-slate-900 font-sans">
+    <div className="min-h-screen bg-[#F6F6F7] flex text-slate-900 font-sans relative overflow-hidden">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[45] lg:hidden" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside 
         className={cn(
-          "bg-white border-r border-slate-200 transition-all duration-300 fixed lg:static z-50 h-full",
-          isSidebarOpen ? "w-64" : "w-20"
+          "bg-white border-r border-slate-200 transition-all duration-300 fixed lg:sticky top-0 z-50 h-screen",
+          isSidebarOpen ? "w-64 translate-x-0" : "w-0 lg:w-20 -translate-x-full lg:translate-x-0 overflow-hidden"
         )}
       >
-        <div className="h-full flex flex-col">
-          <div className="p-6 flex items-center justify-between">
-            <div className={cn("flex items-center gap-2 font-bold text-xl tracking-tight text-indigo-950", !isSidebarOpen && "hidden")}>
+        <div className={cn("h-full flex flex-col min-w-[256px]", !isSidebarOpen && "lg:min-w-[80px]")}>
+          <div className="p-6 flex items-center justify-between h-16">
+            <div className={cn("flex items-center gap-2 font-bold text-xl tracking-tight text-indigo-950 whitespace-nowrap", !isSidebarOpen && "lg:hidden")}>
               <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <span>PageRemix <span className="text-indigo-600">AI</span></span>
             </div>
             {!isSidebarOpen && (
-               <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mx-auto">
+               <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mx-auto lg:flex hidden">
                 <Zap className="w-5 h-5 text-white" />
               </div>
             )}
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400">
+               <X className="w-5 h-5" />
+            </button>
           </div>
 
           <nav className="flex-1 px-4 space-y-1 mt-4">
@@ -99,13 +110,16 @@ export default function DashboardShell({
                 icon={item.icon}
                 label={item.label}
                 active={activeTab === item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                }}
               />
             ))}
           </nav>
 
           <div className="p-4 border-t border-slate-100">
-            <div className={cn("bg-green-50 rounded-xl p-4", !isSidebarOpen && "hidden")}>
+            <div className={cn("bg-green-50 rounded-xl p-4 transition-opacity", isSidebarOpen ? "opacity-100" : "lg:opacity-0 pointer-events-none")}>
                <p className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-1">Plan: Free</p>
                <p className="text-sm text-slate-600">Unlimited AI Remixes</p>
             </div>
@@ -114,16 +128,16 @@ export default function DashboardShell({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 sticky top-0 z-40">
+      <main className="flex-1 min-w-0">
+        <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40">
            <div className="flex items-center gap-4">
               <button 
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-500 lg:flex hidden"
+                className="p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-500"
               >
-                <Menu className="w-5 h-5" />
+                {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-              <h2 className="font-semibold text-slate-800 capitalize">{activeTab.replace('-', ' ')}</h2>
+              <h2 className="font-semibold text-slate-800 capitalize truncate">{activeTab.replace('-', ' ')}</h2>
            </div>
 
            <div className="flex items-center gap-4">
